@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Adventure Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Adventure Game</h1>
+  <div id="game">
+    <div id="map"></div>
+    <div id="actions">
+      <button onclick="move('north')">Go North</button>
+      <button onclick="move('south')">Go South</button>
+      <button onclick="move('east')">Go East</button>
+      <button onclick="move('west')">Go West</button>
+    </div>
+    <div id="message"></div>
+    <div id="inventory">
+      <h3>Inventory</h3>
+      <ul id="items"></ul>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
