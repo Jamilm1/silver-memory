@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120" viewBox="0 0 160 120">
+  <rect width="160" height="120" fill="#eef9ef"/>
+  <path d="M80 20 C 60 30, 40 50, 80 90 C 120 50, 100 30, 80 20 Z" fill="#2ecc71" stroke="#117a3a" stroke-width="2"/>
+  <text x="8" y="110" font-size="12" fill="#117a3a">Magic Leaf</text>
+</svg>

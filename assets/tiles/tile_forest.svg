@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200">
+  <rect width="320" height="200" fill="#d8f3dc"/>
+  <circle cx="60" cy="120" r="40" fill="#2f7a2a"/>
+  <circle cx="120" cy="100" r="50" fill="#4a7a2f"/>
+  <text x="10" y="30" font-size="18" fill="#1b4332">Forest</text>
+</svg>
