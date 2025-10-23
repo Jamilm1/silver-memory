@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200">
+  <rect width="320" height="200" fill="#e6f0ff"/>
+  <rect x="20" y="120" width="280" height="22" fill="#8d6e63" rx="3"/>
+  <text x="10" y="30" font-size="18" fill="#264653">Bridge</text>
+</svg>

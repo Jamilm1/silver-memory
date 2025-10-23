@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120" viewBox="0 0 160 120">
+  <rect width="160" height="120" fill="#fff7ed"/>
+  <rect x="60" y="30" width="40" height="60" rx="8" fill="#ff6b6b"/>
+  <rect x="66" y="18" width="28" height="14" rx="4" fill="#e5a4a4"/>
+  <text x="8" y="110" font-size="12" fill="#6b2b2b">Healing Potion</text>
+</svg>

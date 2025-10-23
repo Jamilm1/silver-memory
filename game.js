@@ -1,19 +1,19 @@
-// Enhanced game logic: dialogue, actions, simple combat and item use
+// Improved visuals, pickup animation, tooltips and visited map tracking
 const map = [
   [
-    { desc: "a dark forest", item: "Magic Leaf", npc: null, enemy: null },
-    { desc: "a sunny clearing", event: "You spot a wild rabbit.", npc: {name:'Old Traveler',dialogue:["Greetings, stranger.","The cave hides a secret."]}, enemy: null },
-    { desc: "an old stone bridge", item: "Stone Key", npc: null, enemy: null }
+    { desc: "a dark forest", item: "Magic Leaf", itemImage: "assets/items/item_magic_leaf.svg", tile: "assets/tiles/tile_forest.svg", npc: null, enemy: null, visited:false },
+    { desc: "a sunny clearing", event: "You spot a wild rabbit.", item: null, tile: "assets/tiles/tile_clearing.svg", npc: {name:'Old Traveler',dialogue:["Greetings, stranger.","The cave hides a secret."]}, enemy: null, visited:false },
+    { desc: "an old stone bridge", item: "Stone Key", itemImage: "assets/items/item_stone_key.svg", tile: "assets/tiles/tile_bridge.svg", npc: null, enemy: null, visited:false }
   ],
   [
-    { desc: "a bubbling brook", event: "You find a shiny coin in the water.", npc:null, enemy:null },
-    { desc: "the village square", event: "Villagers greet you warmly.", npc:{name:'Merchant', dialogue:["Buy my wares?","I need a favor: fetch my hammer."]}, enemy:null, shop:true },
-    { desc: "the blacksmith's forge", item: "Iron Sword", npc:{name:'Blacksmith', dialogue:["A fine sword for a brave soul.","Bring me ore and I'll upgrade it."]}, enemy:null }
+    { desc: "a bubbling brook", event: "You find a shiny coin in the water.", item:null, tile: "assets/tiles/tile_brook.svg", npc:null, enemy:null, visited:false },
+    { desc: "the village square", event: "Villagers greet you warmly.", item:null, tile: "assets/tiles/tile_village.svg", npc:{name:'Merchant', dialogue:["Buy my wares?","I need a favor: fetch my hammer."]}, enemy:null, shop:true, visited:false },
+    { desc: "the blacksmith's forge", item: "Iron Sword", itemImage: "assets/items/item_iron_sword.svg", tile: "assets/tiles/tile_forge.svg", npc:{name:'Blacksmith', dialogue:["A fine sword for a brave soul.","Bring me ore and I'll upgrade it."]}, enemy:null, visited:false }
   ],
   [
-    { desc: "a misty mountain path", event: "A chilly wind blows.", npc:null, enemy:{name:'Wolf',hp:20,atk:6} },
-    { desc: "an abandoned hut", item: "Healing Potion", npc:null, enemy:null, locked:true, lockDesc:"The door is boarded up." },
-    { desc: "a mysterious cave", event: "It's dark. You feel uneasy.", npc:null, enemy:{name:'Goblin',hp:18,atk:5} }
+    { desc: "a misty mountain path", event: "A chilly wind blows.", item:null, tile: "assets/tiles/tile_mountain.svg", npc:null, enemy:{name:'Wolf',hp:20,atk:6}, visited:false },
+    { desc: "an abandoned hut", item: "Healing Potion", itemImage: "assets/items/item_potion.svg", tile: "assets/tiles/tile_hut.svg", npc:null, enemy:null, locked:true, lockDesc:"The door is boarded up.", visited:false },
+    { desc: "a mysterious cave", event: "It's dark. You feel uneasy.", item:null, tile: "assets/tiles/tile_cave.svg", npc:null, enemy:{name:'Goblin',hp:18,atk:5}, visited:false }
   ]
 ];
 
@@ -30,8 +30,11 @@ let currentEnemy = null;
 
 function setLocationText() {
   const loc = map[player.y][player.x];
+  loc.visited = true;
   document.getElementById('location').textContent = loc.desc;
   document.getElementById('map').textContent = `You are at ${loc.desc}.`;
+  updateVisuals();
+  renderMinimap();
 }
 
 function updateHP() {
@@ -52,7 +55,13 @@ function refreshInventory() {
   player.inventory.forEach((it, i) => {
     const opt = document.createElement('option'); opt.value = it; opt.textContent = it;
     sel.appendChild(opt);
-    const d = document.createElement('div'); d.textContent = `- ${it}`; list.appendChild(d);
+    const d = document.createElement('div'); d.className = 'inv-item'; d.textContent = `${it}`;
+    // tooltips for inventory items
+    if (it === 'Healing Potion') d.title = 'Restores 30 HP when used.';
+    if (it === 'Stone Key') d.title = 'Opens boarded doors nearby.';
+    if (it === 'Iron Sword') d.title = 'Increases your attack when equipped.';
+    if (it === 'Magic Leaf') d.title = 'A mysterious leaf with a faint glow.';
+    list.appendChild(d);
   });
 }
 
@@ -84,6 +93,29 @@ function move(dir) {
   player.x = nx; player.y = ny; setLocationText(); triggerEvent();
 }
 
+function updateVisuals() {
+  const loc = map[player.y][player.x];
+  const tileImg = document.getElementById('tile-img');
+  const itemImg = document.getElementById('item-img');
+
+  if (loc.tile) {
+    tileImg.src = loc.tile;
+    tileImg.style.display = '';
+  } else {
+    tileImg.style.display = 'none';
+  }
+
+  if (loc.item && loc.itemImage) {
+    itemImg.src = loc.itemImage;
+    itemImg.style.display = '';
+    itemImg.alt = loc.item;
+    // tooltip for item
+    itemImg.title = loc.item + (loc.item === 'Healing Potion' ? ': Restores 30 HP.' : '');
+  } else {
+    itemImg.style.display = 'none';
+  }
+}
+
 function triggerEvent() {
   clearChoices();
   const loc = map[player.y][player.x];
@@ -96,8 +128,41 @@ function triggerEvent() {
     startCombat(Object.assign({}, loc.enemy));
     return;
   }
+  if (loc.item) {
+    // don't auto-pick: show a Pick up choice
+    addChoice(`Pick up ${loc.item}`, () => pickUpItem());
+    addChoice('Leave it', () => { showMessage('You leave the item where it is.'); clearChoices(); });
+  }
   if (!msg) msg = 'Nothing interesting here.';
   showMessage(msg);
+}
+
+function animatePickup(el, cb) {
+  if (!el) { if (cb) cb(); return; }
+  el.classList.remove('picked');
+  // force reflow
+  void el.offsetWidth;
+  el.classList.add('picked');
+  function done() { el.classList.remove('picked'); el.removeEventListener('animationend', done); if (cb) cb(); }
+  el.addEventListener('animationend', done);
+}
+
+function pickUpItem() {
+  const loc = map[player.y][player.x];
+  if (!loc.item) { showMessage('There is nothing to pick up here.'); return; }
+  const it = loc.item;
+  const itemImg = document.getElementById('item-img');
+  // animate then add to inventory
+  animatePickup(itemImg, () => {
+    player.inventory.push(it);
+    loc.item = null;
+    loc.itemImage = null;
+    refreshInventory();
+    updateVisuals();
+    showMessage(`You picked up: ${it}`);
+    clearChoices();
+    renderMinimap();
+  });
 }
 
 function talk() {
@@ -119,7 +184,9 @@ function talk() {
 function searchArea() {
   const loc = map[player.y][player.x];
   if (loc.item) {
-    const it = loc.item; player.inventory.push(it); loc.item = null; refreshInventory(); showMessage(`You picked up: ${it}`); return;
+    addChoice(`Pick up ${loc.item}`, () => pickUpItem());
+    showMessage('You find something interesting.');
+    return;
   }
   if (loc.locked) {
     showMessage('The entrance is locked or blocked. Maybe an item can help.');
@@ -166,7 +233,6 @@ function useSelectedItem() {
   }
   if (it === 'Iron Sword') {
     player.attack += 4; showMessage('You equip the Iron Sword. Attack increased.');
-    // mark as equipped but keep in inventory
     return;
   }
   showMessage(`Using ${it} had no obvious effect.`);
@@ -201,6 +267,21 @@ function flee(){
   showMessage('You fail to flee! The enemy attacks.');
   const edmg = Math.max(1, (currentEnemy.atk||3) + Math.floor(Math.random()*4)-1);
   player.hp -= edmg; updateHP(); if (player.hp<=0){ showMessage('You have been defeated. Game over.'); inCombat=false; clearChoices(); }
+}
+
+function renderMinimap() {
+  const mm = document.getElementById('minimap');
+  mm.innerHTML = '';
+  for (let y=0;y<map.length;y++){
+    for (let x=0;x<map[y].length;x++){ 
+      const t = document.createElement('div'); t.className = 'minimap-tile';
+      if (map[y][x].visited) t.classList.add('minimap-visited');
+      if (x===player.x && y===player.y) t.classList.add('minimap-current');
+      // short label
+      t.textContent = (x===player.x && y===player.y) ? '*' : (map[y][x].visited ? 'v' : '');
+      mm.appendChild(t);
+    }
+  }
 }
 
 window.onload = function(){
