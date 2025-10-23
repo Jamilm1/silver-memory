@@ -6,53 +6,40 @@ body {
   padding: 0;
 }
 #game {
-  max-width: 500px;
-  margin: 40px auto;
+  max-width: 720px;
+  margin: 24px auto;
   background: #353b48;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 4px 18px #000a;
 }
-#map {
-  font-size: 1.2em;
-  margin-bottom: 16px;
-}
-#actions button {
+#status { margin-bottom: 8px; }
+#map { font-size: 1.1em; margin-bottom: 12px; }
+#controls { display: flex; gap: 12px; flex-wrap: wrap; }
+#move, #actions { display:flex; gap:8px; flex-wrap:wrap; }
+.btn {
   margin: 4px;
   background: #4ecca3;
   color: #23272e;
   border: none;
-  padding: 8px 18px;
+  padding: 8px 12px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
 }
-#actions button:hover {
-  background: #3fae8f;
-}
-#message {
-  margin: 12px 0;
-  min-height: 32px;
-}
-#inventory {
-  background: #23272e;
-  border-radius: 6px;
-  padding: 12px;
-  margin-top: 18px;
-}
-#inventory h3 {
-  margin: 0 0 8px;
-}
-#items {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-#items li {
-  margin: 3px 0;
-  padding: 3px 8px;
-  background: #4ecca3;
-  color: #23272e;
-  border-radius: 3px;
-  display: inline-block;
+.btn:hover { background: #3fae8f; }
+.btn.danger { background: #ff6b6b; color: #fff; }
+#message { margin: 12px 0; min-height: 48px; padding:8px; background: rgba(0,0,0,0.12); border-radius:6px; }
+.choices { margin: 8px 0; }
+.choice-btn { margin-right:8px; background:#ffd166; color:#23272e; }
+#inventory { background: #23272e; border-radius: 6px; padding: 12px; margin-top: 12px; }
+#inv-list { margin-top:8px; }
+#log { margin-top:12px; background:#1f2328; padding:10px; border-radius:6px; max-height:200px; overflow:auto; }
+#log h3 { margin:0 0 6px 0; }
+#log-entries div { margin-bottom:6px; }
+
+/* responsive */
+@media (max-width:600px){
+  #game{padding:12px}
+  .btn{padding:6px 8px}
 }

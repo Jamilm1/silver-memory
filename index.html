@@ -8,19 +8,45 @@
 <body>
   <h1>Adventure Game</h1>
   <div id="game">
-    <div id="map"></div>
-    <div id="actions">
-      <button onclick="move('north')">Go North</button>
-      <button onclick="move('south')">Go South</button>
-      <button onclick="move('east')">Go East</button>
-      <button onclick="move('west')">Go West</button>
+    <div id="status">
+      <span id="location"></span> | HP: <span id="hp">100</span>
     </div>
+    <div id="map"></div>
+
+    <div id="controls">
+      <div id="move">
+        <button class="btn" onclick="move('north')">North</button>
+        <button class="btn" onclick="move('south')">South</button>
+        <button class="btn" onclick="move('east')">East</button>
+        <button class="btn" onclick="move('west')">West</button>
+      </div>
+      <div id="actions">
+        <button class="btn" onclick="talk()">Talk</button>
+        <button class="btn" onclick="searchArea()">Search</button>
+        <button class="btn" onclick="inspect()">Inspect</button>
+        <button class="btn" onclick="openUseItem()">Use Item</button>
+        <button class="btn danger" onclick="attack()">Attack</button>
+        <button class="btn" onclick="flee()">Flee</button>
+      </div>
+    </div>
+
     <div id="message"></div>
+
+    <div id="choices" class="choices"></div>
+
     <div id="inventory">
       <h3>Inventory</h3>
-      <ul id="items"></ul>
+      <select id="items"></select>
+      <button class="btn" onclick="useSelectedItem()">Use Selected</button>
+      <div id="inv-list"></div>
+    </div>
+
+    <div id="log">
+      <h3>Log</h3>
+      <div id="log-entries"></div>
     </div>
   </div>
+
   <script src="game.js"></script>
 </body>
 </html>
